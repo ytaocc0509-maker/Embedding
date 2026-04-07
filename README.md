@@ -1,1 +1,1 @@
-Embedding_改为接入千问的text-embedding-v4模型
+
