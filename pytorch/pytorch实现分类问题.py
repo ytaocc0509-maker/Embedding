@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # 数据读取
-data = pd.read_csv("./dataset/credit-a.csv", header=None)
+data = pd.read_csv("dataset_01/credit-a.csv", header=None)
 
 print(data.head())
 
