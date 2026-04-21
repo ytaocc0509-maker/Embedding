@@ -54,6 +54,7 @@ for train_or_test in ['train', 'test']:
     for spec in species:
         print(train_or_test, spec, len(os.listdir(os.path.join(base_dir, train_or_test, spec))))
 
+# 定义图像预处理的流水线
 transform = transforms.Compose([
     # 统一缩放到96 * 96
     transforms.Resize((96, 96)),
@@ -62,12 +63,14 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 
+# 文件夹中加载图像数据集，自动为每个子文件夹分配一个类别标签
 train_ds = torchvision.datasets.ImageFolder(train_dir, transform=transform)
 
 test_ds = torchvision.datasets.ImageFolder(test_dir, transform=transform)
 
 batch_size = 32  # 定义每次模型训练时处理的样本数量（批大小
 
+# 将 Dataset 对象包装成可迭代的数据加载器，用于批量处理数据。
 train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
 
@@ -164,7 +167,7 @@ model = Net()
 if torch.cuda.is_available():
     model.to(device)
 
-optimizer = optim.Adam(model.parameters(), lr=0.001)  # Adam 优化器
+optimizer = optim.Adam(model.parameters(), lr=0.001)  # 创建 Adam 优化器 (获取模型的所有训练参数，学习率)
 loss_fn = nn.CrossEntropyLoss()  # 交叉熵损失函数
 
 
