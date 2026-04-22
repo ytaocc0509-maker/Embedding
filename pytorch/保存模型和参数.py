@@ -18,42 +18,6 @@ base_dir = './dataset'
 train_dir = os.path.join(base_dir, 'train')
 test_dir = os.path.join(base_dir, 'test')
 
-# filenames = os.listdir('./dataset')
-#
-# species = ['cloudy', 'rain', 'shine', 'sunrise']
-
-# # 创建train和test目录
-# if not os.path.exists(train_dir):
-#     os.mkdir(train_dir)
-#
-# if not os.path.exists(test_dir):
-#     os.mkdir(test_dir)
-#
-# # 分别在train和test目录下创建4种类别的目录
-# for train_or_test in ['train', 'test']:
-#     for spec in species:
-#         path = os.path.join(base_dir, train_or_test, spec)
-#         os.mkdir(path)
-
-# 要判断一个图片属于哪个类别.
-# 'cloudy' in img
-
-# # 要把dataset中的图片全部拷贝到train, test目录下的4个子目录中.
-# for i, img in enumerate(filenames):
-#     for spec in species:
-#         if spec in img:
-#             img_path = os.path.join(base_dir, img)
-#             if i % 5 == 0:
-#                 path = os.path.join(base_dir, 'test', spec, img)
-#             else:
-#                 path = os.path.join(base_dir, 'train', spec, img)
-#             shutil.copy(img_path, path)
-#
-# # 打印每个类别训练数据和测试数据分别有多少图片
-# for train_or_test in ['train', 'test']:
-#     for spec in species:
-#         print(train_or_test, spec, len(os.listdir(os.path.join(base_dir, train_or_test, spec))))
-
 # 定义图像预处理的流水线
 transform = transforms.Compose([
     # 统一缩放到96 * 96
@@ -75,47 +39,6 @@ train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
 
 
-# imgs, labels = next(iter(train_dl))
-
-# # 显示一张图片
-# img = imgs[0]
-
-# img = img + 1
-# img = img / 2
-
-# # reshape不可以, 会打乱数据.
-# plt.imshow(img.permute(1, 2, 0))
-# plt.show()
-
-# 定义模型 卷积神经网络模型
-# class Net(nn.Module):
-#     def __init__(self):
-#         super().__init__()
-#         self.conv1 = nn.Conv2d(3, 16, 3)  # 卷积1 16 * 94 * 94
-#         self.pool = nn.MaxPool2d(2, 2)  # 池化 16 * 47 * 47
-#         self.conv2 = nn.Conv2d(16, 32, 3)  # 卷积2 32 * 45 * 45  -> pooling -> 32 * 22 * 22
-#         self.conv3 = nn.Conv2d(32, 64, 3)  # 卷积3 64 * 20 * 20  -> pooling -> 64 * 10 * 10
-#         self.dropout = nn.Dropout()  # dropout 丢弃部分数据
-#
-#         # batch , channel, height, width, 64,
-#         self.fc1 = nn.Linear(64 * 10 * 10, 1024)
-#         self.fc2 = nn.Linear(1024, 256)
-#         self.fc3 = nn.Linear(256, 4)
-#
-#         # 前向传播
-#
-#     def forward(self, x):
-#         x = self.pool(F.relu(self.conv1(x)))
-#         x = self.pool(F.relu(self.conv2(x)))
-#         x = self.pool(F.relu(self.conv3(x)))
-#         # x.view(-1, 64 * 10 * 10)
-#         x = nn.Flatten()(x)  # 自动处理批次维度
-#         x = F.relu(self.fc1(x))
-#         x = self.dropout(x)
-#         x = F.relu(self.fc2(x))
-#         x = self.dropout(x)
-#         x = self.fc3(x)
-#         return x
 
 # 添加BN层.
 # 定义模型
@@ -227,25 +150,74 @@ def fit(epoch, model, train_loader, test_loader):
     return epoch_loss, epoch_acc, test_epoch_loss, test_epoch_acc
 
 
+
+
+
+# 模型保存
+#torch.save(model.state_dict(), './my_model.pth')
+
+# 恢复模型
+# new_model = Net()
+# new_model.load_state_dict(torch.load('./my_model.pth'))
+
+#print(model.state_dict())
+
+
+
+# 把新的模型拷到GPU上, 进行测试
+# new_model.to(device)
+
+# test_correct = 0
+# test_total = 0
+# new_model.eval()
+# with torch.no_grad():
+#     for x, y in test_dl:
+#         x, y = x.to(device), y.to(device)
+#         y_pred = new_model(x)
+#         y_pred = torch.argmax(y_pred, dim=1)
+#         test_correct += (y_pred == y).sum().item()
+#         test_total += y.size(0)
+
+# epoch_test_acc = test_correct / test_total
+# print(epoch_test_acc)
+
+
+# 保存最优参数
+
+import copy
+
+# 没有训练之前的初始化参数, 
+best_model_weight = model.state_dict()
+
 epochs = 20
+best_acc = 0.0
+
 train_loss = []
 train_acc = []
 test_loss = []
 test_acc = []
+
 for epoch in range(epochs):
-    epoch_loss, epoch_acc, test_epoch_loss, test_epoch_acc = fit(epoch, model, train_dl, test_dl)
+    epoch_loss, epoch_acc, epoch_test_loss, epoch_test_acc = fit(epoch, model, train_dl, test_dl)
     train_loss.append(epoch_loss)
     train_acc.append(epoch_acc)
+    test_loss.append(epoch_test_loss)
+    test_acc.append(epoch_test_acc)
+    
+    if epoch_test_acc > best_acc:
+        best_acc = epoch_test_acc
+        # 更新参数
+        best_model_weight = copy.deepcopy(model.state_dict())
 
-    test_loss.append(test_epoch_loss)
-    test_acc.append(test_epoch_acc)
 
+# 保存完成模型
 
-# 模型保存
-torch.save(model.state_dict(), './my_model.pth')
+# 把最好的参数加载到模型中
+model.load_state_dict(best_model_weight)
 
-# 恢复模型
-new_model = Net()
-new_model.load_state_dict(torch.load('./my_model.pth'))
+torch.save(model, './my_whole_model.pth')
 
-print(model.state_dict())
+new_model2 = torch.load('./my_whole_model.pth')
+
+new_model2.state_dict()
+
