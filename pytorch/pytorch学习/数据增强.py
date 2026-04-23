@@ -9,7 +9,7 @@ from torchvision import transforms
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 
-base_dir = './dataset'
+base_dir = '../dataset'
 train_dir = os.path.join(base_dir, 'train')
 test_dir = os.path.join(base_dir, 'test')
 

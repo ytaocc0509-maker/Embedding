@@ -14,11 +14,11 @@ import shutil
 
 from torchvision import transforms
 
-base_dir = './dataset'
+base_dir = '../dataset'
 train_dir = os.path.join(base_dir, 'train')
 test_dir = os.path.join(base_dir, 'test')
 
-filenames = os.listdir('./dataset')
+filenames = os.listdir('../dataset')
 
 species = ['cloudy', 'rain', 'shine', 'sunrise']
 

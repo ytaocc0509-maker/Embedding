@@ -14,7 +14,7 @@ import shutil
 
 from torchvision import transforms
 
-base_dir = './dataset'
+base_dir = '../dataset'
 train_dir = os.path.join(base_dir, 'train')
 test_dir = os.path.join(base_dir, 'test')
 
@@ -215,9 +215,9 @@ for epoch in range(epochs):
 # 把最好的参数加载到模型中
 model.load_state_dict(best_model_weight)
 
-torch.save(model, './my_whole_model.pth')
+torch.save(model, 'my_whole_model.pth')
 
-new_model2 = torch.load('./my_whole_model.pth')
+new_model2 = torch.load('my_whole_model.pth')
 
 new_model2.state_dict()
 

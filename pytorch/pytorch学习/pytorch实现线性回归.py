@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data = pd.read_csv('dataset_01/Income1.csv')
+data = pd.read_csv('../dataset_01/Income1.csv')
 
 # print(data)
 # plt.scatter(data.Education, data.Income)
