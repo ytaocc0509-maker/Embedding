@@ -35,3 +35,6 @@ Thumbs.db
 
 #Qwen API
 Embedding/.env
+
+#训练数据
+Pytorch/ChnSentiCorp
